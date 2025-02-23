@@ -2,7 +2,7 @@ const express = require('express');
 const { connectDB, getDB } = require('./db');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const swaggerSetup = require('./swagger/swagger');
+const swaggerSetup = require('./swagger');
 
 
 const app = express();
