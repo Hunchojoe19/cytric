@@ -3,6 +3,7 @@ const { connectDB, getDB } = require('./db');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const swaggerSetup = require('./swagger');
+const rateLimit = require('express-rate-limit');
 
 
 const app = express();
@@ -17,16 +18,64 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100 
+}));
+
 connectDB().then(() => {
   app.listen(process.env.PORT || 3000, () => {
     console.log(`Server running on port ${process.env.PORT || 3000}`);
   });
 });
 
+/**
+ * @swagger
+ * /api/nfts:
+ *   post:
+ *     summary: Create a new NFT
+ *     tags: [NFTs]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nftName:
+ *                 type: string
+ *               nftDescription:
+ *                 type: string
+ *               nftLogoUrl:
+ *                 type: string
+ *               nftId:
+ *                 type: number
+ *               userWalletAddress:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: NFT created successfully
+ *       400:
+ *         description: All fields are required or NFT ID already exists
+ *       500:
+ *         description: Internal server error
+ */
 app.post('/api/nfts', async (req, res) => {
+  const { nftName, nftDescription, nftLogoUrl, nftId, userWalletAddress } = req.body;
+
+  if (!nftName || !nftDescription || !nftLogoUrl || !nftId || !userWalletAddress) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
   try {
     const db = getDB();
-    const result = await db.collection('nfts').insertOne(req.body);
+    const result = await db.collection('nfts').insertOne({
+      nftName,
+      nftDescription,
+      nftLogoUrl,
+      nftId,
+      userWalletAddress
+    });
     res.status(201).json({ ...req.body, _id: result.insertedId });
   } catch (error) {
     if (error.code === 11000) {
@@ -35,7 +84,27 @@ app.post('/api/nfts', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
+/**
+ * @swagger
+ * /api/nfts/{id}:
+ *   get:
+ *     summary: Get an NFT by ID
+ *     tags: [NFTs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: The NFT ID
+ *     responses:
+ *       200:
+ *         description: NFT found
+ *       404:
+ *         description: NFT not found
+ *       500:
+ *         description: Internal server error
+ */
 app.get('/api/nfts/:id', async (req, res) => {
   try {
     const db = getDB();
@@ -48,7 +117,25 @@ app.get('/api/nfts/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
+/**
+ * @swagger
+ * /api/nfts/user/{wallet}:
+ *   get:
+ *     summary: Get NFTs by user wallet
+ *     tags: [NFTs]
+ *     parameters:
+ *       - in: path
+ *         name: wallet
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user's wallet address
+ *     responses:
+ *       200:
+ *         description: NFTs found
+ *       500:
+ *         description: Internal server error
+ */
 app.get('/api/nfts/user/:wallet', async (req, res) => {
   try {
     const db = getDB();
