@@ -7,13 +7,13 @@ const rateLimit = require('express-rate-limit');
 
 
 const app = express();
-app.use(express.json());
+app.use(express.json())
 app.use(helmet());
 app.use(morgan('dev'));
 const cors = require('cors');
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'https://yourdomain.com'],
+  origin: ['http://localhost:3000', 'http://localhost:5173', 'https://nft-minting-jo3q.onrender.com/'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
