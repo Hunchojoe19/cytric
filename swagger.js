@@ -31,7 +31,7 @@
 
 // module.exports = swaggerSetup;
 const swaggerUi = require('swagger-ui-express');
-const swaggerJsDoc = require('swagger-jsdoc'); // Ensure this is required
+const swaggerJsDoc = require('swagger-jsdoc'); 
 
 const swaggerOptions = {
   swaggerDefinition: {
@@ -44,10 +44,12 @@ const swaggerOptions = {
     servers: [
       {
         url: 'http://localhost:3000', 
+        description: 'Local server'
     
       },
       {
         url: 'https://nft-minting-jo3q.onrender.com',
+        description: 'Deployed server'
 
       }
     ]

@@ -12,23 +12,24 @@ app.use(helmet());
 app.use(morgan('dev'));
 const cors = require('cors');
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000', 'http://localhost:5173');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', 'http://localhost:3000', 'http://localhost:5173');
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+//   res.header('Access-Control-Allow-Credentials', 'true');
   
-  if (req.method === 'OPTIONS') {
-    return res.status(200).json({});
-  }
+//   if (req.method === 'OPTIONS') {
+//     return res.status(200).json({});
+//   }
   
-  next();
-});
-// app.use(cors({
-//   origin: ['http://localhost:3000', 'http://localhost:5173', 'https://nft-minting-jo3q.onrender.com/'],
-//   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//   credentials: true
-// }));
+//   next();
+// });
+app.use(cors({
+  origin: ['http://localhost:5173'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  headers: ["Content-Type"],
+  credentials: true
+}));
 
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
